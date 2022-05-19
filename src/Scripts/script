@@ -1,0 +1,4 @@
+help
+show
+filter_by_head 1
+execute_script script
