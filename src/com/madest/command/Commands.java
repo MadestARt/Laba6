@@ -20,23 +20,18 @@ public class Commands {
 
 
     public Commands(Server server) {
-        commandsMap = new HashMap<>(Map.of(
-                "show",(System.out::println),
+        commandsMap = new HashMap<String, Command>(Map.of(
+                "show",new ShowCommand(),
                 "help",new HelpCommand(),
                 "filter_by_head",new FilterByHeadCommand(server),
-                "history",(set -> System.out.println(server.getCommandsUsed())),
-                "remove_by_id",(dSet -> dSet.getDragonSet().removeIf(dragon -> dragon.getId() == Integer.parseInt(server.getArgument()))),
-                "info",(dSet -> System.out.println("HasSet<Dragon> dragonSet " + "дата инициализации : " + server.getLocalDateTime() + " размер " + dSet.size())),
-                "clear",(DragonSetHolder::clear),
+                "history",new HistoryCommand(),
+                "remove_by_id",new RemoveByIdCommand(),
+                "info",new InfoCommand(),
+                "clear",new CleanCommand(),
                 "print_descending",new PrintDescendingCommand(),
-                "print_field_descending_type",(dSet -> {
-                    for (Dragon dragon : dSet.getDragonSet()) {
-                        System.out.println(dragon.getType());
-                    }
-                }),
                 "add",new AddCommand(server)
         ));
-        commandsMap.put("exit",(dragonsSet -> {})); // хотите ли вы сохранить сет ? авто сохранять в tmp
+        commandsMap.put("exit",(dragonsSet -> {}));
         commandsMap.put("update",new UpdateIdCommand(server));
         commandsMap.put("save",new SaveCollectionCommand());
         commandsMap.put("add_if_min",new AddIfMinCommand(server));

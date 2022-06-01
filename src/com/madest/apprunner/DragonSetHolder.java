@@ -33,6 +33,10 @@ public class DragonSetHolder {
         return dragonSet.size();
     }
 
+    public void setNewDragonSet(Set<Dragon> dragonSet) {
+        this.dragonSet = dragonSet;
+    }
+
     public void clear() {
         dragonSet.clear();
     }

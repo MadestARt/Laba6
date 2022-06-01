@@ -12,6 +12,7 @@ import com.madest.exceptions.ServerCreationException;
 import java.io.*;
 import java.net.ServerSocket;
 
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -24,8 +25,9 @@ public class Server {
     private String fileName;
     private String[] commandArguments;
     private boolean stopped;
-    private List<String> commandsUsed;
-    private String argument;
+    private static List<String> commandsUsed;
+    private static LocalDateTime initDateTime;
+    private static String argument;
     private LocalDateTime localDateTime;
 
 
@@ -53,19 +55,22 @@ public class Server {
         }
     }
 
+
+
     private void runClientWork(ServerSocket server) throws IOException {
         while (true) {
-            var clientConnection = server.accept();
+                var clientConnection = server.accept();
+                System.out.println("Клиент " + clientConnection + " подключился");
 
-            try (var inputStream = new DataInputStream(clientConnection.getInputStream());
-                 var outputStream = new DataOutputStream(clientConnection.getOutputStream())) {
+                 var inputStream = new DataInputStream(clientConnection.getInputStream());
+                 var outputStream = new DataOutputStream(clientConnection.getOutputStream());
                 FileHolder fileHolder = new FileHolder(fileName);
                 DragonSetHolder dragonSet = new DragonSetHolder();
                 fillDragonsSet(fileHolder, dragonSet);
 
 
                 while (!stopped) {
-                    var commandWithArgs = inputStream.readUTF();
+                    var commandWithArgs = (inputStream.readUTF());
 
                     commandArguments = commandWithArgs.split(" ");
                     Commands commands = new Commands(this);
@@ -86,7 +91,6 @@ public class Server {
                 }
 
 
-            }
         }
     }
 
@@ -98,7 +102,8 @@ public class Server {
             while ((readObject = objectInputStream.readObject()) != null){
                 dragonSet.add((Dragon) readObject);
             }
-            System.out.println("Драконы из файлы считаны успешно,можете приступить к вводу команд\nСписок всех доступных команд : help");
+            initDateTime = LocalDateTime.now();
+            System.out.println("Драконы из файла считаны успешно,можете приступить к вводу команд\nСписок всех доступных команд : help");
         } catch (EOFException ignored) {
         } catch (FileNotFoundException e) {
             System.out.println("Путь к файлу указан неверно , введите повторно имя файла");
@@ -108,11 +113,11 @@ public class Server {
         }
     }
 
-    public List<String> getCommandsUsed() {
+    public static List<String> getCommandsUsed() {
         return commandsUsed;
     }
 
-    public String getArgument() {
+    public static String getArgument() {
         return argument;
     }
 
@@ -123,4 +128,9 @@ public class Server {
     public String[] getCommandArguments() {
         return commandArguments;
     }
+
+    public static LocalDateTime getInitDateTime() {
+        return initDateTime;
+    }
+
 }
